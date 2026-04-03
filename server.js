@@ -441,73 +441,6 @@ app.post('/transfers/fees', authMiddleware, (req, res) => {
   res.json(response);
 });
 
-// POST /transfers/rails-quote - Get quote for all payment rails - The new feature request
-app.post('/transfers/rails-quote', authMiddleware, (req, res) => {
-  const { amount, currency, beneficiaryId, destinationCountry } = req.body;
-
-  // Validate required fields
-  if (amount === undefined) {
-    return res.status(400).json({
-      code: 'VALIDATION_ERROR',
-      message: 'Missing required fields',
-      details: [{ field: 'amount', reason: 'Amount is required' }]
-    });
-  }
-
-  const now = new Date();
-  const quotedAt = now.toISOString();
-  const expiresAt = new Date(now.getTime() + 15 * 60 * 1000).toISOString(); // 15 minutes validity
-
-  // Calculate fees and delivery for each rail
-  const achFees = calculateTransferFees('ach', amount, destinationCountry);
-  const wireFees = calculateTransferFees('wire', amount, destinationCountry);
-  const rtpFees = calculateTransferFees('rtp', amount, destinationCountry);
-
-  // Determine RTP availability (simulate some beneficiaries not supporting RTP)
-  const rtpAvailable = beneficiaryId ? !beneficiaryId.includes('ACH') : faker.datatype.boolean(0.8);
-
-  const rails = [
-    {
-      rail: 'ach',
-      available: true,
-      fee: achFees.transferFee,
-      estimatedDelivery: achFees.estimatedDelivery,
-      deliveryDescription: achFees.deliverySpeed
-    },
-    {
-      rail: 'wire',
-      available: true,
-      fee: wireFees.transferFee,
-      estimatedDelivery: wireFees.estimatedDelivery,
-      deliveryDescription: wireFees.deliverySpeed
-    }
-  ];
-
-  // Add RTP rail with availability check
-  if (rtpAvailable) {
-    rails.push({
-      rail: 'rtp',
-      available: true,
-      fee: rtpFees.transferFee,
-      estimatedDelivery: rtpFees.estimatedDelivery,
-      deliveryDescription: rtpFees.deliverySpeed
-    });
-  } else {
-    rails.push({
-      rail: 'rtp',
-      available: false,
-      unavailableReason: 'Recipient bank does not support RTP'
-    });
-  }
-
-  res.json({
-    amount: parseFloat(amount),
-    currency: currency || 'USD',
-    quotedAt,
-    expiresAt,
-    rails
-  });
-});
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -544,7 +477,6 @@ if (require.main === module) {
     console.log(`  GET  /transfers/:transferId        - Get transfer details`);
     console.log(`  POST /transfers/:transferId/cancel - Cancel transfer`);
     console.log(`  POST /transfers/validate           - Validate transfer`);
-    console.log(`  POST /transfers/rails-quote        - Get quote for all payment rails`);
     console.log(`  POST /transfers/fees               - Calculate transfer fees`);
     console.log(`  GET  /health                       - Health check`);
     console.log(`\nNote: All endpoints except /health require Bearer token authentication`);
