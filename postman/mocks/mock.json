@@ -1,0 +1,13 @@
+{
+  "id": "5238fc25-ef0e-4c7d-8286-9f2889317508",
+  "version": 1,
+  "name": "Transfer API Mock",
+  "protocol": "http",
+  "port": 4500,
+  "mockSrc": "./mock.js",
+  "autoRestartOnChange": true,
+  "logging": {
+    "level": "verbose",
+    "showBody": true
+  }
+}

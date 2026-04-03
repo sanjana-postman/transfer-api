@@ -1,0 +1,52 @@
+$kind: http-request
+name: Get quote for all payment rails
+description: >-
+  Returns fee estimates and estimated delivery times for all available payment
+  rails (ACH, Wire, RTP) for a given transfer amount and destination. Enables a
+  rail-selection UX where end users can compare cost vs. speed before confirming
+  a transfer.
+
+
+  **Request fields**
+
+
+  - `amount` _(number, required)_: Transfer amount in the specified currency.
+      
+  - `currency` _(string, required)_: ISO 4217 currency code (e.g. `USD`).
+      
+  - `sourceAccountId` _(string, required)_: The source account identifier.
+      
+  - `beneficiaryId` _(string, required)_: The registered beneficiary identifier
+  for the destination.
+      
+
+  **Response**  
+
+
+  Returns a `rails` array, each entry containing:
+
+
+  - `rail` – Payment rail type: `ach`, `wire`, or `rtp`
+      
+  - `fee` – Estimated fee in the transfer currency
+      
+  - `estimatedDelivery` – Human-readable
+url: "{{baseUrl}}/transfers/rails-quote"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "amount": 500.00, 
+        "currency": "USD", 
+        "beneficiaryId": "BEN-ACH-00234"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{bearerToken}}"
+examples: ./.resources/Get quote for all payment rails.resources/examples
+order: 1000

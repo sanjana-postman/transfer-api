@@ -1,0 +1,26 @@
+$kind: http-request
+description: Validate transfer details before submission to ensure the request
+  is well-formed and eligible for processing.
+url: "{{baseUrl}}/transfers/validate"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "sourceAccountId": "AC12345678901234",
+      "beneficiaryId": "BEN123456789",
+      "amount": 1500,
+      "currency": "string",
+      "type": "rtp",
+      "memo": "string",
+      "scheduledDate": "2011-11-06"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{bearerToken}}"
+examples: ./.resources/Validate transfer.resources/examples
+order: 1000

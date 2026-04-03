@@ -1,0 +1,56 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/transfers?fromDate=<date>&toDate=<date>&status=failed&type=wi\
+    re&limit=20&offset=0"
+  method: GET
+  headers:
+    - key: Accept
+      value: application/json
+    - key: Authorization
+      value: Bearer <token>
+      description: "Added as a part of security scheme: bearer"
+  queryParams:
+    - key: fromDate
+      value: <date>
+      description: Filter start date
+    - key: toDate
+      value: <date>
+      description: Filter end date
+    - key: status
+      value: failed
+      description: Filter by transfer status
+    - key: type
+      value: wire
+      description: Filter by transfer type
+    - key: limit
+      value: "20"
+      description: Maximum number of results to return
+    - key: offset
+      value: "0"
+      description: Pagination offset
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 401
+  statusText: Unauthorized
+  headers:
+    Content-Type: application/json
+  body:
+    type: text
+    content: |-
+      {
+        "error": "<string>",
+        "message": "<string>",
+        "details": [
+          {
+            "field": "<string>",
+            "message": "<string>"
+          },
+          {
+            "field": "<string>",
+            "message": "<string>"
+          }
+        ]
+      }
+order: 3000

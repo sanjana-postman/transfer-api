@@ -1,0 +1,47 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/transfers"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: Accept
+      value: application/json
+    - key: Authorization
+      value: Bearer <token>
+      description: "Added as a part of security scheme: bearer"
+  body:
+    type: json
+    content: |-
+      {
+        "sourceAccountId": "AC12345678901234",
+        "beneficiaryId": "BEN123456789",
+        "amount": 1500,
+        "currency": "USD",
+        "type": "rtp",
+        "memo": "towards my loan",
+        "scheduledDate": "2026-04-07"
+      }
+response:
+  statusCode: 201
+  statusText: Created
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "transferId": "TRF789012345",
+        "sourceAccountId": "AC12345678901234",
+        "beneficiaryId": "BEN123456789",
+        "amount": 1500,
+        "currency": "USD",
+        "type": "ach",
+        "status": "completed",
+        "fee": 25,
+        "memo": "Invoice payment #12345",
+        "estimatedDelivery": "2026-04-08",
+        "createdAt": "2026-04-07T16:10:09.870Z",
+        "updatedAt": "2026-04-07T16:10:09.870Z"
+      }
+order: 1000
