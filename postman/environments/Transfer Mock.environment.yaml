@@ -1,0 +1,5 @@
+name: Transfer Mock
+values:
+  - key: baseUrl
+    value: 'http://localhost:4500'
+    enabled: true

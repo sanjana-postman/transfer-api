@@ -1,0 +1,19 @@
+$kind: http-request
+description: Retrieve details for a specific transfer by its unique identifier.
+url: "{{baseUrl}}/transfers/:transferId"
+method: GET
+headers:
+  Accept: application/json
+pathVariables:
+  - key: transferId
+    value: string
+    description: The unique identifier of the transfer
+body:
+  type: text
+  content: ""
+auth:
+  type: bearer
+  credentials:
+    token: "{{bearerToken}}"
+examples: ./.resources/Get transfer details.resources/examples
+order: 2000

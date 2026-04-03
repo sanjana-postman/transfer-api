@@ -1,0 +1,20 @@
+$kind: http-request
+description: Cancel a pending transfer. Only available for transfers in
+  `scheduled` or `pending` status.
+url: "{{baseUrl}}/transfers/:transferId/cancel"
+method: POST
+headers:
+  Accept: application/json
+pathVariables:
+  - key: transferId
+    value: string
+    description: The unique identifier of the transfer
+body:
+  type: text
+  content: ""
+auth:
+  type: bearer
+  credentials:
+    token: "{{bearerToken}}"
+examples: ./.resources/Cancel transfer.resources/examples
+order: 1000

@@ -1,0 +1,21 @@
+$kind: http-request
+description: Get a fee estimate for a transfer based on amount, type, and currency.
+url: "{{baseUrl}}/transfers/fees"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "amount": 3347.999365741228,
+      "type": "ach",
+      "currency": "string"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{bearerToken}}"
+examples: ./.resources/Calculate transfer fees.resources/examples
+order: 1000

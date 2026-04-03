@@ -1,0 +1,40 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/transfers/:transferId"
+  method: GET
+  headers:
+    - key: Accept
+      value: application/json
+    - key: Authorization
+      value: Bearer <token>
+      description: "Added as a part of security scheme: bearer"
+  pathVariables:
+    - key: transferId
+      value: string
+      description: The unique identifier of the transfer
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: text
+    content: |-
+      {
+        "transferId": "TRF789012345",
+        "sourceAccountId": "<string>",
+        "beneficiaryId": "<string>",
+        "amount": 1500,
+        "currency": "USD",
+        "type": "ach",
+        "status": "completed",
+        "fee": 25,
+        "memo": "Invoice payment #12345",
+        "estimatedDelivery": "<dateTime>",
+        "createdAt": "2021-01-19T16:10:09.870Z",
+        "updatedAt": "<dateTime>"
+      }
+order: 1000

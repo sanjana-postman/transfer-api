@@ -1,0 +1,31 @@
+$kind: http-request
+description: Retrieve transfer history with optional filtering.
+url: "{{baseUrl}}/transfers?fromDate=<date>&toDate=<date>&status=failed&type=wi\
+  re&limit=20&offset=0"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: fromDate
+    value: <date>
+    description: Filter start date
+  - key: toDate
+    value: <date>
+    description: Filter end date
+  - key: status
+    value: failed
+    description: Filter by transfer status
+  - key: type
+    value: wire
+    description: Filter by transfer type
+  - key: limit
+    value: "20"
+    description: Maximum number of results to return
+  - key: offset
+    value: "0"
+    description: Pagination offset
+body:
+  type: text
+  content: ""
+examples: ./.resources/List transfers.resources/examples
+order: 5000
