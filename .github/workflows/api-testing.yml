@@ -14,10 +14,9 @@ jobs:
         run: postman login --with-api-key ${{ secrets.POSTMAN_API_KEY }}
       - name: Lint the spec
         run: |
-          postman spec lint "a8458904-1dab-419c-8fee-eb8849afe339" --report-events 
+          postman spec lint "fa5e3177-a6bf-4af1-888a-a8e6c53c4326" --report-events 
       - name: Run API tests
         run: |
-          postman collection run "52921466-e9cc692d-20f7-4a68-a51c-a9772806fa1f" -e \
-          "52921466-22ce3f24-a0b7-4a09-9e8d-ec823f63ef2a" --report-events 
+          postman collection run "52921466-31ec18c1-369d-4209-84ca-17915ebc5bbb" -e "52921466-a315960b-a042-40ad-8b3b-c623819330e0" --report-events 
       
     
