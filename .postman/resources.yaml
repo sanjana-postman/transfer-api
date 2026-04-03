@@ -2,6 +2,15 @@
 workspace:
   id: f78c0f32-9c0a-4bea-976a-86ee0e96ba4d
 
+# Each entry here maps a local resource to one or more corresponding objects in Postman Cloud
+cloudResources:
+  environments:
+    ../postman/environments/Transfer Mock.environment.yaml: 39582660-251b-4d20-b354-b85931e80fcc
+  specs:
+    ../postman/specs/index.yaml: fa5e3177-a6bf-4af1-888a-a8e6c53c4326
+  collections:
+    ../postman/collections/Transfer API: 52921466-31ec18c1-369d-4209-84ca-17915ebc5bbb
+
 # All resources in the `postman/` folder are automatically registered in Local View.
 # Point to additional files outside the `postman/` folder to register them individually. Example:
 #localResources:
