@@ -1,0 +1,35 @@
+{
+  "name": "payment-status-api-acme-fin",
+  "version": "1.0.0",
+  "description": "Mock Payment Status API server",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/postman-eng/payment-status-api-acme-fin.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/postman-eng/payment-status-api-acme-fin/issues"
+  },
+  "homepage": "https://github.com/postman-eng/payment-status-api-acme-fin#readme",
+  "dependencies": {
+    "@faker-js/faker": "^8.3.1",
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-junit": "^16.0.0",
+    "supertest": "^6.3.4"
+  }
+}
