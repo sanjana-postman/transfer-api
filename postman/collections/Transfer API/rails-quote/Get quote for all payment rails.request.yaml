@@ -1,14 +1,9 @@
 $kind: http-request
 name: Get quote for all payment rails
-description: >-
-  Returns fee estimates and estimated delivery times for all available payment
-  rails (ACH, Wire, RTP) for a given transfer amount and destination. Enables a
-  rail-selection UX where end users can compare cost vs. speed before confirming
-  a transfer.
-
+description: |-
+  Returns fee estimates and estimated delivery times for all available payment rails (ACH, Wire, RTP) for a given transfer amount and destination. Enables a rail-selection UX where end users can compare cost vs. speed before confirming a transfer.
 
   **Request fields**
-
 
   - `amount` _(number, required)_: Transfer amount in the specified currency.
       
@@ -16,15 +11,12 @@ description: >-
       
   - `sourceAccountId` _(string, required)_: The source account identifier.
       
-  - `beneficiaryId` _(string, required)_: The registered beneficiary identifier
-  for the destination.
+  - `beneficiaryId` _(string, required)_: The registered beneficiary identifier for the destination.
       
 
   **Response**  
 
-
   Returns a `rails` array, each entry containing:
-
 
   - `rail` – Payment rail type: `ach`, `wire`, or `rtp`
       
@@ -48,5 +40,12 @@ auth:
   type: bearer
   credentials:
     token: "{{bearerToken}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 200", function () {
+          pm.response.to.have.status(200);
+      });
+    language: text/javascript
 examples: ./.resources/Get quote for all payment rails.resources/examples
 order: 1000
