@@ -24,11 +24,26 @@ jobs:
 
           echo "::group::Sync the Spec with Collection"
 
-          # 3. If not in-sync, trigger a sync and poll until complete
-          SYNC_RESPONSE=$(curl --fail-with-body --include \
+          # Trigger the spec sync
+          SYNC_RESPONSE=$(curl --silent --include \
+              --write-out "\n%{http_code}" \
               --request PUT \
               --header "X-Api-Key: ${POSTMAN_API_KEY}" \
               --header "Content-Type: application/json" \
               "https://api.getpostman.com/collections/${COLLECTION_ID}/synchronizations?specId=${SPEC_ID}")
 
-          echo "Sync response: ${SYNC_RESPONSE}"
+          HTTP_STATUS=$(echo "${SYNC_RESPONSE}" | tail -n1)
+          BODY=$(echo "${SYNC_RESPONSE}" | head -n -1)
+
+          echo "Sync response: ${BODY}"
+          echo "HTTP status: ${HTTP_STATUS}"
+
+          # 2xx → sync was successfully made; 400 → spec is already in sync
+          if [[ "${HTTP_STATUS}" =~ ^2 ]]; then
+            echo "✅ Sync successful — collection has been updated to match the spec."
+          elif [[ "${HTTP_STATUS}" == "400" ]]; then
+            echo "✅ Spec is already in sync with the collection. No action needed."
+          else
+            echo "::error::Sync failed with unexpected status ${HTTP_STATUS}."
+            exit 1
+          fi
