@@ -25,9 +25,10 @@ jobs:
           echo "::group::Sync the Spec with Collection"
 
           # 3. If not in-sync, trigger a sync and poll until complete
-          SYNC_RESPONSE=$(curl --silent --fail --include \
+          SYNC_RESPONSE=$(curl --fail-with-body --include \
               --request PUT \
               --header "X-Api-Key: ${POSTMAN_API_KEY}" \
               --header "Content-Type: application/json" \
               "https://api.getpostman.com/collections/${COLLECTION_ID}/synchronizations?specId=${SPEC_ID}")
 
+          echo "Sync response: ${SYNC_RESPONSE}"
