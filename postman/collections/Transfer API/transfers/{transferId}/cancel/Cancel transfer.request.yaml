@@ -1,6 +1,4 @@
 $kind: http-request
-description: Cancel a pending transfer. Only available for transfers in
-  `scheduled` or `pending` status.
 url: "{{baseUrl}}/transfers/:transferId/cancel"
 method: POST
 headers:
