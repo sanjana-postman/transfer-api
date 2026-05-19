@@ -1,0 +1,28 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/transfers"
+  method: POST
+  headers:
+    Content-Type: application/json
+    Accept: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "sourceAccountId": "AC12345678901234",
+        "beneficiaryId": "BEN123456789",
+        "amount": 1500,
+        "currency": "USD",
+        "type": "rtp",
+        "memo": "towards my loan",
+        "scheduledDate": "2026-04-07"
+      }
+response:
+  statusCode: 504
+  statusText: Gateway Timeout
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: '{"message": "Timeout!"}'
+order: 2000

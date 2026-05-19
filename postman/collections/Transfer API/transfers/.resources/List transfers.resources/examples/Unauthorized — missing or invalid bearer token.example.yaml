@@ -1,7 +1,6 @@
 $kind: http-example
 request:
-  url: "{{baseUrl}}/transfers?fromDate=<date>&toDate=<date>&status=failed&type=wi\
-    re&limit=20&offset=0"
+  url: "{{baseUrl}}/transfers?fromDate=<date>&toDate=<date>&status=failed&type=wire&limit=20&offset=0"
   method: GET
   headers:
     - key: Accept

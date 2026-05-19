@@ -1,48 +1,60 @@
 openapi: 3.0.0
 info:
-  title: Money Transfer API
+  title: Transfer API
   version: 1.0.0
-  description: |
-    The Transfers API enables initiation and management of fund transfers including
+  description: >-
+    The Transfers API enables initiation and management of fund transfers
+    including
+
     ACH, wire transfers, and real-time payments.
+
 
     ## Features
 
+
     - Initiate domestic and international transfers
+
     - Support for ACH, Wire, and RTP
+
     - Transfer scheduling
+
     - Transfer status tracking and cancellation
+
 
     ## Transfer Types
 
+
     - **ACH**: Standard domestic transfers (1-3 business days)
+
     - **Wire**: Same-day domestic and international transfers
+
     - **RTP**: Real-time payments (instant, domestic only)
+
 
     ## Contact Support
 
+
     **Name:** Banking Payments API Support
+
     **Email:** api-support@acmefinancial.com
+
+
+
+    Contact Support:
+     Name: Banking Payments API Support
+     Email: api-support@acmefinancial.com
   contact:
     name: Banking Payments API Support
     email: api-support@acmefinancial.com
-
 servers:
-  - url: "{baseUrl}"
-    description: Base server URL
-    variables:
-      baseUrl:
-        default: https://api.acmefinancial.com
-
+  - url: https://api.acmefinancial.com
 security:
-  - bearerAuth: []
-
+  - BearerAuth: []
 tags:
   - name: Transfers
     description: Operations for initiating and managing fund transfers
   - name: Utilities
     description: Validation, fee calculation, and quoting utilities
-
 paths:
   /transfers:
     get:
@@ -57,63 +69,69 @@ paths:
           description: Filter start date
           required: false
           schema:
-            $ref: "#/components/schemas/TransferFromDateParam"
+            $ref: '#/components/schemas/TransferFromDateParam'
         - name: toDate
           in: query
           description: Filter end date
           required: false
           schema:
-            $ref: "#/components/schemas/TransferToDateParam"
+            $ref: '#/components/schemas/TransferToDateParam'
         - name: status
           in: query
           description: Filter by transfer status
           required: false
           schema:
-            $ref: "#/components/schemas/TransferStatus"
+            $ref: '#/components/schemas/TransferStatus'
         - name: type
           in: query
           description: Filter by transfer type
           required: false
           schema:
-            $ref: "#/components/schemas/TransferType"
+            $ref: '#/components/schemas/TransferType'
         - name: limit
           in: query
           description: Maximum number of results to return
           required: false
           schema:
-            $ref: "#/components/schemas/TransferLimitParam"
+            $ref: '#/components/schemas/TransferLimitParam'
         - name: offset
           in: query
           description: Pagination offset
           required: false
           schema:
-            $ref: "#/components/schemas/TransferOffsetParam"
+            $ref: '#/components/schemas/TransferOffsetParam'
       responses:
-        "200":
+        '200':
           description: A paginated list of transfers
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TransferListResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-
+                $ref: '#/components/schemas/TransferListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     post:
       tags:
         - Transfers
       summary: Initiate transfer
       operationId: initiateTransfer
-      description: |
-        Transfer funds across 3 payment rails: ACH, Wire Transfer, Real-Time Payments.
+      description: >
+        Transfer funds across 3 payment rails: ACH, Wire Transfer, Real-Time
+        Payments.
 
-        Fees and processing times vary dynamically based on the payment rail type:
+
+        Fees and processing times vary dynamically based on the payment rail
+        type:
+
         - **ACH**: Lower fees, 1-3 business days processing
+
         - **Wire**: Higher fees, same-day or next-day processing
+
         - **RTP**: Moderate fees, instant processing
+
 
         These factors are also influenced by transfer amount and destination.
       requestBody:
@@ -121,68 +139,59 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/InitiateTransferRequest"
+              $ref: '#/components/schemas/InitiateTransferRequest'
             example:
-              sourceAccountId: "AC-9827364501-CHK"
-              beneficiaryId: "BEN-ACH-00234"
+              sourceAccountId: AC-9827364501-CHK
+              beneficiaryId: BEN-ACH-00234
               amount: 2500
-              currency: "USD"
-              type: "ach"
-              memo: "Monthly rent payment - Unit 4B"
+              currency: USD
+              type: ach
+              memo: Monthly rent payment - Unit 4B
       responses:
-        "201":
+        '201':
           description: Transfer successfully initiated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Transfer"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "422":
-          $ref: "#/components/responses/UnprocessableEntity"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-
+                $ref: '#/components/schemas/Transfer'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /transfers/validate:
     post:
       tags:
         - Utilities
       summary: Validate transfer
       operationId: validateTransfer
-      description: Validate transfer details before submission to ensure the request is well-formed and eligible for processing.
+      description: >-
+        Validate transfer details before submission to ensure the request is
+        well-formed and eligible for processing.
       security:
-        - bearerAuth: []
+        - BearerAuth: []
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/InitiateTransferRequest"
-            example:
-              sourceAccountId: "AC-9827364501-CHK"
-              beneficiaryId: "BEN-ACH-00234"
-              amount: 2500
-              currency: "USD"
-              type: "ach"
-              memo: "Vendor payment"
+              type: object
+        required: true
       responses:
-        "200":
+        '200':
           description: Validation result
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ValidationResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "422":
-          $ref: "#/components/responses/UnprocessableEntity"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-
+        '400':
+          description: Bad request — invalid or missing parameters
+        '401':
+          description: Unauthorized — missing or invalid bearer token
+        '422':
+          description: >-
+            Unprocessable entity — request is well-formed but contains semantic
+            errors
+        '500':
+          description: Internal server error
   /transfers/fees:
     post:
       tags:
@@ -191,67 +200,161 @@ paths:
       operationId: calculateTransferFees
       description: Get a fee estimate for a transfer based on amount, type, and currency.
       security:
-        - bearerAuth: []
+        - BearerAuth: []
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/FeeEstimateRequest"
-            example:
-              amount: 2500
-              type: "ach"
-              currency: "USD"
+              type: object
+        required: true
       responses:
-        "200":
+        '200':
           description: Fee estimate for the requested transfer
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/FeeEstimateResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-
+        '400':
+          description: Bad request — invalid or missing parameters
+        '401':
+          description: Unauthorized — missing or invalid bearer token
+        '500':
+          description: Internal server error
   /transfers/rails-quote:
     post:
       tags:
         - Utilities
       summary: Get quote for all payment rails
       operationId: getRailsQuote
-      description: |
-        Returns fee estimates and delivery times for all available payment rails
-        (ACH, Wire, RTP) for a given transfer amount and destination.
-        Enables comparison UX for end users before initiating a transfer.
+      description: >-
+        Returns fee estimates and estimated delivery times for all available
+        payment rails (ACH, Wire, RTP) for a given transfer amount and
+        destination. Enables a rail-selection UX where end users can compare
+        cost vs. speed before confirming a transfer.
+
+
+        **Request fields**
+
+
+        - `amount` _(number, required)_: Transfer amount in the specified
+        currency.
+            
+        - `currency` _(string, required)_: ISO 4217 currency code (e.g. `USD`).
+            
+        - `sourceAccountId` _(string, required)_: The source account identifier.
+            
+        - `beneficiaryId` _(string, required)_: The registered beneficiary
+        identifier for the destination.
+            
+
+        **Response**
+
+
+        Returns a `rails` array, each entry containing:
+
+
+        - `rail` – Payment rail type: `ach`, `wire`, or `rtp`
+            
+        - `fee` – Estimated fee in the transfer currency
+            
+        - `estimatedDelivery` – Human-readable
       security:
-        - bearerAuth: []
+        - BearerAuth: []
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RailsQuoteRequest"
+              type: object
+              properties:
+                amount:
+                  type: integer
+                currency:
+                  type: string
+                beneficiaryId:
+                  type: string
             example:
-              amount: 500.00
-              currency: "USD"
-              beneficiaryId: "BEN-ACH-00234"
+              amount: 500
+              currency: USD
+              beneficiaryId: BEN-ACH-00234
+        required: true
       responses:
-        "200":
+        '200':
           description: Quote details for all available payment rails
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RailsQuoteResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-
+                type: object
+                properties:
+                  transferAmount:
+                    type: object
+                    properties:
+                      amount:
+                        type: integer
+                      currency:
+                        type: string
+                  beneficiaryId:
+                    type: string
+                  railOptions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        railType:
+                          type: string
+                        estimatedFee:
+                          type: object
+                          properties:
+                            amount:
+                              type: number
+                            currency:
+                              type: string
+                        estimatedDeliveryTime:
+                          type: string
+                        processingSpeed:
+                          type: string
+                        available:
+                          type: boolean
+                        description:
+                          type: string
+                  quoteId:
+                    type: string
+                  expiresAt:
+                    type: string
+                    format: date-time
+              example:
+                transferAmount:
+                  amount: 500
+                  currency: USD
+                beneficiaryId: BEN-ACH-00234
+                railOptions:
+                  - railType: ACH
+                    estimatedFee:
+                      amount: 2.5
+                      currency: USD
+                    estimatedDeliveryTime: 1-3 business days
+                    processingSpeed: standard
+                    available: true
+                    description: Automated Clearing House - Standard domestic transfer
+                  - railType: Wire
+                    estimatedFee:
+                      amount: 25
+                      currency: USD
+                    estimatedDeliveryTime: Same day
+                    processingSpeed: fast
+                    available: true
+                    description: Wire Transfer - Same-day domestic transfer
+                  - railType: RTP
+                    estimatedFee:
+                      amount: 5
+                      currency: USD
+                    estimatedDeliveryTime: Instant
+                    processingSpeed: instant
+                    available: true
+                    description: Real-Time Payments - Instant domestic transfer
+                quoteId: QTE-2024-001234
+                expiresAt: '2026-03-15T18:30:00Z'
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{vault:key}}
   /transfers/{transferId}:
     get:
       tags:
@@ -260,56 +363,109 @@ paths:
       operationId: getTransferDetails
       description: Retrieve details for a specific transfer by its unique identifier.
       security:
-        - bearerAuth: []
+        - BearerAuth: []
       parameters:
-        - $ref: "#/components/parameters/transferId"
+        - $ref: '#/components/parameters/transferId'
       responses:
-        "200":
+        '200':
           description: Transfer details
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Transfer"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-
+        '401':
+          description: Unauthorized — missing or invalid bearer token
+        '404':
+          description: Not found — the requested resource does not exist
+        '500':
+          description: Internal server error
+    parameters:
+      - name: transferId
+        in: path
+        required: true
+        description: The unique identifier of the transfer
+        schema:
+          type: string
+        example: string
   /transfers/{transferId}/cancel:
     post:
       tags:
         - Transfers
       summary: Cancel transfer
       operationId: cancelTransfer
-      description: Cancel a pending transfer. Only available for transfers in `scheduled` or `pending` status.
+      description: >-
+        Cancel a pending transfer. Only available for transfers in `scheduled`
+        or `pending` status.
       security:
-        - bearerAuth: []
+        - BearerAuth: []
       parameters:
-        - $ref: "#/components/parameters/transferId"
+        - $ref: '#/components/parameters/transferId'
       responses:
-        "200":
+        '200':
           description: Transfer successfully cancelled
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CancelTransferResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "409":
+        '400':
+          description: Bad request — invalid or missing parameters
+        '401':
+          description: Unauthorized — missing or invalid bearer token
+        '404':
+          description: Not found — the requested resource does not exist
+        '409':
           description: Conflict — transfer cannot be cancelled in its current state
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-
+        '500':
+          description: Internal server error
+    parameters:
+      - name: transferId
+        in: path
+        required: true
+        description: The unique identifier of the transfer
+        schema:
+          type: string
+        example: string
+        
+    get:
+      summary: List transfers
+      parameters:
+        - name: fromDate
+          in: query
+          description: Filter start date
+          schema:
+            type: string
+          example: <date>
+        - name: toDate
+          in: query
+          description: Filter end date
+          schema:
+            type: string
+          example: <date>
+        - name: status
+          in: query
+          description: Filter by transfer status
+          schema:
+            type: string
+          example: failed
+        - name: type
+          in: query
+          description: Filter by transfer type
+          schema:
+            type: string
+          example: wire
+        - name: limit
+          in: query
+          description: Maximum number of results to return
+          schema:
+            type: integer
+          example: 20
+        - name: offset
+          in: query
+          description: Pagination offset
+          schema:
+            type: integer
+          example: 0
+      responses:
+        '200':
+          description: A paginated list of transfers
+        '400':
+          description: Bad request — invalid or missing parameters
+        '401':
+          description: Unauthorized — missing or invalid bearer token
+        '500':
+          description: Internal server error
 components:
   securitySchemes:
     bearerAuth:
@@ -317,7 +473,9 @@ components:
       scheme: bearer
       bearerFormat: JWT
       description: Bearer token authentication. Use `{{bearerToken}}` as the token value.
-
+    BearerAuth:
+      type: http
+      scheme: bearer
   parameters:
     transferId:
       name: transferId
@@ -325,21 +483,18 @@ components:
       required: true
       description: The unique identifier of the transfer
       schema:
-        $ref: "#/components/schemas/TransferIdParam"
-
+        $ref: '#/components/schemas/TransferIdParam'
   schemas:
     TransferFromDateParam:
       type: string
       format: date
       description: Filter start date for transfer queries
-      example: "2023-05-27"
-
+      example: '2023-05-27'
     TransferToDateParam:
       type: string
       format: date
       description: Filter end date for transfer queries
-      example: "2023-05-27"
-
+      example: '2023-05-27'
     TransferLimitParam:
       type: integer
       minimum: 1
@@ -347,31 +502,31 @@ components:
       default: 20
       description: Maximum number of results to return
       example: 20
-
     TransferOffsetParam:
       type: integer
       minimum: 0
       default: 0
       description: Pagination offset
       example: 0
-
     TransferIdParam:
       type: string
       description: The unique identifier of the transfer
-      example: "TXN-20230527-00123"
-
+      example: TXN-20230527-00123
     TransferType:
       type: string
       enum:
         - ach
         - wire
         - rtp
-      description: |
+      description: >
         Payment rail type:
-        - `ach`: Automated Clearing House — standard domestic (1-3 business days)
-        - `wire`: Wire transfer — same-day domestic and international
-        - `rtp`: Real-Time Payments — instant, domestic only
 
+        - `ach`: Automated Clearing House — standard domestic (1-3 business
+        days)
+
+        - `wire`: Wire transfer — same-day domestic and international
+
+        - `rtp`: Real-Time Payments — instant, domestic only
     TransferStatus:
       type: string
       enum:
@@ -382,67 +537,65 @@ components:
         - cancelled
         - failed
       description: Current status of the transfer
-
     Transfer:
       type: object
       properties:
         transferId:
           type: string
           description: Unique identifier for the transfer
-          example: "TXN-20230527-00123"
+          example: TXN-20230527-00123
         sourceAccountId:
           type: string
           description: Source account identifier
-          example: "AC-9827364501-CHK"
+          example: AC-9827364501-CHK
         beneficiaryId:
           type: string
           description: Beneficiary identifier
-          example: "BEN-ACH-00234"
+          example: BEN-ACH-00234
         amount:
           type: number
           format: double
           description: Transfer amount
-          example: 2500.00
+          example: 2500
         currency:
           type: string
           description: ISO 4217 currency code
-          example: "USD"
+          example: USD
         type:
-          $ref: "#/components/schemas/TransferType"
+          $ref: '#/components/schemas/TransferType'
         status:
-          $ref: "#/components/schemas/TransferStatus"
+          $ref: '#/components/schemas/TransferStatus'
         fee:
           type: number
           format: double
           description: Fee charged for the transfer
-          example: 0.50
+          example: 0.5
         memo:
           type: string
           description: Optional memo or reference note
-          example: "Monthly rent payment - Unit 4B"
+          example: Monthly rent payment - Unit 4B
         estimatedDelivery:
           type: string
           format: date-time
           description: Estimated delivery date and time
-          example: "2023-05-30T17:00:00Z"
+          example: '2023-05-30T17:00:00Z'
         createdAt:
           type: string
           format: date-time
           description: Timestamp when the transfer was created
-          example: "2023-05-27T10:00:00Z"
+          example: '2023-05-27T10:00:00Z'
         updatedAt:
           type: string
           format: date-time
           description: Timestamp when the transfer was last updated
-          example: "2023-05-27T10:05:00Z"
-
+          example: '2023-05-27T10:05:00Z'
     TransferListResponse:
       type: object
       properties:
         data:
           type: array
           items:
-            $ref: "#/components/schemas/Transfer"
+            $ref: '#/components/schemas/Transfer'
         total:
           type: integer
           description: Total number of matching transfers
@@ -455,7 +608,6 @@ components:
           type: integer
           description: Pagination offset used
           example: 0
-
     InitiateTransferRequest:
       type: object
       required:
@@ -468,33 +620,32 @@ components:
         sourceAccountId:
           type: string
           description: The account ID to debit funds from
-          example: "AC-9827364501-CHK"
+          example: AC-9827364501-CHK
         beneficiaryId:
           type: string
           description: The registered beneficiary to credit funds to
-          example: "BEN-ACH-00234"
+          example: BEN-ACH-00234
         amount:
           type: number
           format: double
           description: Amount to transfer (must be positive)
           minimum: 0.01
-          example: 2500.00
+          example: 2500
         currency:
           type: string
           description: ISO 4217 currency code
-          example: "USD"
+          example: USD
         type:
-          $ref: "#/components/schemas/TransferType"
+          $ref: '#/components/schemas/TransferType'
         memo:
           type: string
           description: Optional memo or reference note for the transfer
-          example: "Monthly rent payment - Unit 4B"
+          example: Monthly rent payment - Unit 4B
         scheduledDate:
           type: string
           format: date
           description: Optional future date to schedule the transfer
-          example: "2023-06-01"
-
+          example: '2023-06-01'
     ValidationResponse:
       type: object
       properties:
@@ -511,11 +662,11 @@ components:
               field:
                 type: string
                 description: The field that failed validation
-                example: "amount"
+                example: amount
               message:
                 type: string
                 description: Description of the validation error
-                example: "Amount exceeds daily transfer limit"
+                example: Amount exceeds daily transfer limit
         warnings:
           type: array
           description: Non-blocking warnings about the transfer
@@ -524,11 +675,10 @@ components:
             properties:
               field:
                 type: string
-                example: "type"
+                example: type
               message:
                 type: string
-                example: "RTP is not available for this destination bank"
-
+                example: RTP is not available for this destination bank
     FeeEstimateRequest:
       type: object
       required:
@@ -541,14 +691,13 @@ components:
           format: double
           description: Transfer amount
           minimum: 0.01
-          example: 2500.00
+          example: 2500
         type:
-          $ref: "#/components/schemas/TransferType"
+          $ref: '#/components/schemas/TransferType'
         currency:
           type: string
           description: ISO 4217 currency code
-          example: "USD"
-
+          example: USD
     FeeEstimateResponse:
       type: object
       properties:
@@ -556,23 +705,22 @@ components:
           type: number
           format: double
           description: The transfer amount provided
-          example: 2500.00
+          example: 2500
         currency:
           type: string
-          example: "USD"
+          example: USD
         type:
-          $ref: "#/components/schemas/TransferType"
+          $ref: '#/components/schemas/TransferType'
         fee:
           type: number
           format: double
           description: Estimated fee for the transfer
-          example: 0.50
+          example: 0.5
         estimatedDelivery:
           type: string
           format: date-time
           description: Estimated delivery date and time
-          example: "2023-05-30T17:00:00Z"
-
+          example: '2023-05-30T17:00:00Z'
     RailsQuoteRequest:
       type: object
       required:
@@ -585,16 +733,15 @@ components:
           format: double
           description: Transfer amount
           minimum: 0.01
-          example: 500.00
+          example: 500
         currency:
           type: string
           description: ISO 4217 currency code
-          example: "USD"
+          example: USD
         beneficiaryId:
           type: string
           description: The registered beneficiary identifier
-          example: "BEN-ACH-00234"
-
+          example: BEN-ACH-00234
     RailQuote:
       type: object
       properties:
@@ -605,26 +752,25 @@ components:
             - ach
             - wire
             - rtp
-          example: "ach"
+          example: ach
         fee:
           type: number
           format: double
           description: Fee for this rail
-          example: 0.50
+          example: 0.5
         estimatedDelivery:
           type: string
           format: date-time
           description: Estimated delivery date and time for this rail
-          example: "2023-05-30T17:00:00Z"
+          example: '2023-05-30T17:00:00Z'
         deliveryDescription:
           type: string
           description: Human-readable delivery time description
-          example: "1-3 business days"
+          example: 1-3 business days
         available:
           type: boolean
           description: Whether this rail is available for the given transfer
           example: true
-
     RailsQuoteResponse:
       type: object
       properties:
@@ -632,62 +778,60 @@ components:
           type: number
           format: double
           description: The transfer amount quoted
-          example: 500.00
+          example: 500
         currency:
           type: string
-          example: "USD"
+          example: USD
         beneficiaryId:
           type: string
-          example: "BEN-ACH-00234"
+          example: BEN-ACH-00234
         rails:
           type: array
           description: Quote details for each available payment rail
           items:
-            $ref: "#/components/schemas/RailQuote"
+            $ref: '#/components/schemas/RailQuote'
         quotedAt:
           type: string
           format: date-time
           description: Timestamp when the quote was generated
-          example: "2023-05-27T10:00:00Z"
+          example: '2023-05-27T10:00:00Z'
         expiresAt:
           type: string
           format: date-time
           description: Timestamp when the quote expires
-          example: "2023-05-27T10:15:00Z"
-
+          example: '2023-05-27T10:15:00Z'
     CancelTransferResponse:
       type: object
       properties:
         transferId:
           type: string
           description: The ID of the cancelled transfer
-          example: "TXN-20230527-00123"
+          example: TXN-20230527-00123
         status:
           type: string
           enum:
             - cancelled
-          example: "cancelled"
+          example: cancelled
         cancelledAt:
           type: string
           format: date-time
           description: Timestamp when the transfer was cancelled
-          example: "2023-05-27T11:00:00Z"
+          example: '2023-05-27T11:00:00Z'
         message:
           type: string
           description: Confirmation message
-          example: "Transfer successfully cancelled"
-
+          example: Transfer successfully cancelled
     ErrorResponse:
       type: object
       properties:
         error:
           type: string
           description: Error code
-          example: "INVALID_REQUEST"
+          example: INVALID_REQUEST
         message:
           type: string
           description: Human-readable error message
-          example: "The request is missing required fields"
+          example: The request is missing required fields
         details:
           type: array
           description: Additional error details
@@ -696,39 +840,40 @@ components:
             properties:
               field:
                 type: string
-                example: "amount"
+                example: amount
               message:
                 type: string
-                example: "Must be a positive number"
-
+                example: Must be a positive number
   responses:
     BadRequest:
       description: Bad request — invalid or missing parameters
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ErrorResponse"
+            $ref: '#/components/schemas/ErrorResponse'
     Unauthorized:
       description: Unauthorized — missing or invalid bearer token
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ErrorResponse"
+            $ref: '#/components/schemas/ErrorResponse'
     NotFound:
       description: Not found — the requested resource does not exist
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ErrorResponse"
+            $ref: '#/components/schemas/ErrorResponse'
     UnprocessableEntity:
-      description: Unprocessable entity — request is well-formed but contains semantic errors
+      description: >-
+        Unprocessable entity — request is well-formed but contains semantic
+        errors
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ErrorResponse"
+            $ref: '#/components/schemas/ErrorResponse'
     InternalServerError:
       description: Internal server error
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ErrorResponse"
+            $ref: '#/components/schemas/ErrorResponse'

@@ -1,18 +1,14 @@
 $kind: http-request
-description: |
-  Transfer funds across 3 payment rails: ACH, Wire Transfer, Real-Time Payments.
-
-  Fees and processing times vary dynamically based on the payment rail type:
-  - **ACH**: Lower fees, 1-3 business days processing
-  - **Wire**: Higher fees, same-day or next-day processing
-  - **RTP**: Moderate fees, instant processing
-
-  These factors are also influenced by transfer amount and destination.
 url: "{{baseUrl}}/transfers"
 method: POST
 headers:
-  Content-Type: application/json
-  Accept: application/json
+  - key: Content-Type
+    value: application/json
+  - key: Accept
+    value: application/json
+  - key: x-mock-response-code
+    value: "504"
+    disabled: true
 body:
   type: json
   content: |-
@@ -20,10 +16,10 @@ body:
       "sourceAccountId": "AC12345678901234",
       "beneficiaryId": "BEN123456789",
       "amount": 1500,
-      "currency": "string",
+      "currency": "USD",
       "type": "rtp",
-      "memo": "string",
-      "scheduledDate": "2011-11-06"
+      "memo": "towards my loan",
+      "scheduledDate": "2026-04-07"
     }
 examples: ./.resources/Initiate transfer.resources/examples
 order: 4000
