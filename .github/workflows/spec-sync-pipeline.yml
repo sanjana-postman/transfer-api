@@ -22,18 +22,12 @@ jobs:
         run: |
           set -euo pipefail
 
-          echo "::group::Fetching API ID from workspace"
+          echo "::group::Sync the Spec with Collection"
 
           # 3. If not in-sync, trigger a sync and poll until complete
-          if [ "${SYNC_STATUS}" != "in-sync" ]; then
-            echo "::group::Triggering sync (status was '${SYNC_STATUS}')"
-
             SYNC_RESPONSE=$(curl --silent --fail --include \
               --request PUT \
               --header "X-Api-Key: ${POSTMAN_API_KEY}" \
               --header "Content-Type: application/json" \
               "https://api.getpostman.com/collections/{COLLECTION_ID}/synchronizations?specId=${SPEC_ID}")
 
-            echo "Sync triggered."              
-            fi
-            echo "::endgroup::"
