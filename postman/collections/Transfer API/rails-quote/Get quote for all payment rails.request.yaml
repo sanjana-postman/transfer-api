@@ -1,14 +1,9 @@
 $kind: http-request
 name: Get quote for all payment rails
-description: >-
-  Returns fee estimates and estimated delivery times for all available payment
-  rails (ACH, Wire, RTP) for a given transfer amount and destination. Enables a
-  rail-selection UX where end users can compare cost vs. speed before confirming
-  a transfer.
-
+description: |-
+  Returns fee estimates and estimated delivery times for all available payment rails (ACH, Wire, RTP) for a given transfer amount and destination. Enables a rail-selection UX where end users can compare cost vs. speed before confirming a transfer.
 
   **Request fields**
-
 
   - `amount` _(number, required)_: Transfer amount in the specified currency.
       
@@ -16,15 +11,12 @@ description: >-
       
   - `sourceAccountId` _(string, required)_: The source account identifier.
       
-  - `beneficiaryId` _(string, required)_: The registered beneficiary identifier
-  for the destination.
+  - `beneficiaryId` _(string, required)_: The registered beneficiary identifier for the destination.
       
 
   **Response**  
 
-
   Returns a `rails` array, each entry containing:
-
 
   - `rail` – Payment rail type: `ach`, `wire`, or `rtp`
       
@@ -48,5 +40,226 @@ auth:
   type: bearer
   credentials:
     token: "{{bearerToken}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      
+      pm.test("Status code is 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response is valid JSON", function () {
+          pm.response.json();
+      });
+
+      pm.test("Response has required top-level fields", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("transferAmount");
+          pm.expect(json).to.have.property("beneficiaryId");
+          pm.expect(json).to.have.property("railOptions");
+          pm.expect(json).to.have.property("quoteId");
+          pm.expect(json).to.have.property("expiresAt");
+      });
+
+      pm.test("transferAmount reflects the request amount", function () {
+          const json = pm.response.json();
+          pm.expect(json.transferAmount.amount).to.eql(500);
+          pm.expect(json.transferAmount.currency).to.eql("USD");
+      });
+
+      pm.test("beneficiaryId matches the request", function () {
+          const json = pm.response.json();
+          pm.expect(json.beneficiaryId).to.eql("BEN-ACH-00234");
+      });
+
+      pm.test("railOptions is a non-empty array", function () {
+          const json = pm.response.json();
+          pm.expect(json.railOptions).to.be.an("array");
+          pm.expect(json.railOptions.length).to.be.above(0);
+      });
+
+      pm.test("Each rail option has required fields", function () {
+          const json = pm.response.json();
+          json.railOptions.forEach(function (rail) {
+              pm.expect(rail).to.have.property("railType");
+              pm.expect(rail).to.have.property("estimatedFee");
+              pm.expect(rail).to.have.property("estimatedDeliveryTime");
+              pm.expect(rail).to.have.property("processingSpeed");
+              pm.expect(rail).to.have.property("available");
+              pm.expect(rail).to.have.property("description");
+          });
+      });
+
+      pm.test("estimatedFee has amount and currency", function () {
+          const json = pm.response.json();
+          json.railOptions.forEach(function (rail) {
+              pm.expect(rail.estimatedFee.amount).to.be.a("number");
+              pm.expect(rail.estimatedFee.currency).to.be.a("string");
+          });
+      });
+
+      pm.test("available field is boolean", function () {
+          const json = pm.response.json();
+          json.railOptions.forEach(function (rail) {
+              pm.expect(rail.available).to.be.a("boolean");
+          });
+      });
+
+      pm.test("All three rail types are present", function () {
+          const json = pm.response.json();
+          const railTypes = json.railOptions.map(function (rail) { return rail.railType; });
+          pm.expect(railTypes).to.include("ACH");
+          pm.expect(railTypes).to.include("Wire");
+          pm.expect(railTypes).to.include("RTP");
+      });
+
+      pm.test("quoteId is a non-empty string", function () {
+          const json = pm.response.json();
+          pm.expect(json.quoteId).to.be.a("string");
+          pm.expect(json.quoteId.length).to.be.above(0);
+      });
+
+      pm.test("expiresAt is a valid ISO 8601 date string", function () {
+          const json = pm.response.json();
+          const date = new Date(json.expiresAt);
+          pm.expect(isNaN(date.getTime())).to.be.false;
+      });
+
+      pm.test("ACH fee is less than Wire fee", function () {
+          const json = pm.response.json();
+          const ach = json.railOptions.find(function (rail) { return rail.railType === "ACH"; });
+          const wire = json.railOptions.find(function (rail) { return rail.railType === "Wire"; });
+          pm.expect(ach.estimatedFee.amount).to.be.below(wire.estimatedFee.amount);
+      });
+
+      pm.test("RTP processingSpeed is 'instant'", function () {
+          const json = pm.response.json();
+          const rtp = json.railOptions.find(function (rail) { return rail.railType === "RTP"; });
+          pm.expect(rtp.processingSpeed).to.eql("instant");
+      });
+
+      pm.test("Response Content-Type is application/json", function () {
+          pm.expect(pm.response.headers.get("Content-Type")).to.include("application/json");
+      });
+
+      // ============================================================
+      // Visualization: Payment Rails Fee Comparison Chart & Details Table
+      // ============================================================
+
+      var template = '<div style="font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif; padding: 20px; background: #f8f9fa;">' +
+          '<h3 style="color: #2c3e50; margin-bottom: 5px;">Payment Rails Fee Comparison</h3>' +
+          '<p style="color: #7f8c8d; font-size: 13px; margin-top: 0;">Quote ID: {{quoteId}} | Transfer: {{transferAmount}} {{transferCurrency}} | Beneficiary: {{beneficiaryId}}</p>' +
+          '<div style="background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">' +
+              '<canvas id="feeChart" height="200"></canvas>' +
+          '</div>' +
+          '<div style="background: white; border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">' +
+              '<h4 style="color: #2c3e50; margin-top: 0;">Rail Details</h4>' +
+              '<table style="width: 100%; border-collapse: collapse; font-size: 13px;">' +
+                  '<thead>' +
+                      '<tr style="background: #34495e; color: white;">' +
+                          '<th style="padding: 10px 12px; text-align: left; border-radius: 4px 0 0 0;">Rail Type</th>' +
+                          '<th style="padding: 10px 12px; text-align: right;">Fee</th>' +
+                          '<th style="padding: 10px 12px; text-align: left;">Delivery Time</th>' +
+                          '<th style="padding: 10px 12px; text-align: left;">Speed</th>' +
+                          '<th style="padding: 10px 12px; text-align: center;">Available</th>' +
+                          '<th style="padding: 10px 12px; text-align: left; border-radius: 0 4px 0 0;">Description</th>' +
+                      '</tr>' +
+                  '</thead>' +
+                  '<tbody>' +
+                      '{{#each rails}}' +
+                      '<tr style="border-bottom: 1px solid #ecf0f1;">' +
+                          '<td style="padding: 10px 12px; font-weight: 600; color: {{badgeColor}};">{{railType}}</td>' +
+                          '<td style="padding: 10px 12px; text-align: right; font-weight: 600;">{{feeDisplay}}</td>' +
+                          '<td style="padding: 10px 12px;">{{estimatedDeliveryTime}}</td>' +
+                          '<td style="padding: 10px 12px;"><span style="background: {{speedBg}}; color: {{speedColor}}; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase;">{{processingSpeed}}</span></td>' +
+                          '<td style="padding: 10px 12px; text-align: center;">{{availableDisplay}}</td>' +
+                          '<td style="padding: 10px 12px; color: #7f8c8d; font-size: 12px;">{{description}}</td>' +
+                      '</tr>' +
+                      '{{/each}}' +
+                  '</tbody>' +
+              '</table>' +
+          '</div>' +
+          '<p style="color: #95a5a6; font-size: 11px; margin-top: 10px;">Quote expires: {{expiresAt}}</p>' +
+      '</div>' +
+      '<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>' +
+      '<script>' +
+          'var ctx = document.getElementById("feeChart").getContext("2d");' +
+          'new Chart(ctx, {' +
+              'type: "bar",' +
+              'data: {' +
+                  'labels: [' + '{{#each rails}}"{{railType}}"{{#unless @last}},{{/unless}}{{/each}}' + '],' +
+                  'datasets: [{' +
+                      'label: "Estimated Fee (USD)",' +
+                      'data: [' + '{{#each rails}}{{feeAmount}}{{#unless @last}},{{/unless}}{{/each}}' + '],' +
+                      'backgroundColor: ["#3498db", "#e74c3c", "#2ecc71"],' +
+                      'borderColor: ["#2980b9", "#c0392b", "#27ae60"],' +
+                      'borderWidth: 2' +
+                  '}]' +
+              '},' +
+              'options: {' +
+                  'responsive: true,' +
+                  'legend: { display: false },' +
+                  'title: { display: true, text: "Estimated Fees by Payment Rail", fontSize: 14 },' +
+                  'scales: {' +
+                      'yAxes: [{ ticks: { beginAtZero: true, callback: function(value) { return "$" + value.toFixed(2); } }, scaleLabel: { display: true, labelString: "Fee (USD)" } }],' +
+                      'xAxes: [{ scaleLabel: { display: true, labelString: "Payment Rail" } }]' +
+                  '},' +
+                  'tooltips: { callbacks: { label: function(item) { return "$" + item.yLabel.toFixed(2); } } }' +
+              '}' +
+          '});' +
+      '</script>';
+
+      function constructVisualizerPayload() {
+          var json = pm.response.json();
+          var rails = json.railOptions.map(function (rail) {
+              var speedBg = "#ecf0f1";
+              var speedColor = "#2c3e50";
+              if (rail.processingSpeed === "instant") {
+                  speedBg = "#d5f5e3";
+                  speedColor = "#27ae60";
+              } else if (rail.processingSpeed === "fast") {
+                  speedBg = "#fdebd0";
+                  speedColor = "#e67e22";
+              } else if (rail.processingSpeed === "standard") {
+                  speedBg = "#d6eaf8";
+                  speedColor = "#2980b9";
+              }
+
+              var badgeColor = "#2c3e50";
+              if (rail.railType === "ACH") {
+                  badgeColor = "#3498db";
+              } else if (rail.railType === "Wire") {
+                  badgeColor = "#e74c3c";
+              } else if (rail.railType === "RTP") {
+                  badgeColor = "#2ecc71";
+              }
+
+              return {
+                  railType: rail.railType,
+                  feeAmount: rail.estimatedFee.amount,
+                  feeDisplay: "$" + rail.estimatedFee.amount.toFixed(2) + " " + rail.estimatedFee.currency,
+                  estimatedDeliveryTime: rail.estimatedDeliveryTime,
+                  processingSpeed: rail.processingSpeed,
+                  available: rail.available,
+                  availableDisplay: rail.available ? "Yes" : "No",
+                  description: rail.description,
+                  speedBg: speedBg,
+                  speedColor: speedColor,
+                  badgeColor: badgeColor
+              };
+          });
+
+          return {
+              quoteId: json.quoteId,
+              transferAmount: json.transferAmount.amount.toFixed(2),
+              transferCurrency: json.transferAmount.currency,
+              beneficiaryId: json.beneficiaryId,
+              expiresAt: json.expiresAt,
+              rails: rails
+          };
+      }
+
+      pm.visualizer.set(template, constructVisualizerPayload());
+    language: text/javascript
 examples: ./.resources/Get quote for all payment rails.resources/examples
 order: 1000
