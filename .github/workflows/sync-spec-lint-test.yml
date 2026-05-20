@@ -1,0 +1,72 @@
+name: Automated API tests and Lint using Postman CLI
+
+on: push
+
+env:
+  POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
+  WORKSPACE_ID: 'f78c0f32-9c0a-4bea-976a-86ee0e96ba4d'
+  SPEC_ID: 'fa5e3177-a6bf-4af1-888a-a8e6c53c4326'
+  COLLECTION_ID: '52921466-31ec18c1-369d-4209-84ca-17915ebc5bbb'
+  ENVIRONMENT_ID: '52921466-a315960b-a042-40ad-8b3b-c623819330e0'
+
+jobs:
+  postman-api-checks:
+    name: Sync Spec to Collection — Transfer API
+    runs-on: ubuntu-latest
+
+    steps:
+      # ──────────────────────────────────────────────────────────────────────────
+      # STEP 1: Check sync status between spec and collection; sync if out of sync
+      # ──────────────────────────────────────────────────────────────────────────
+      - name: Check and sync collection to spec
+        run: |
+          set -euo pipefail
+
+          echo "::group::Sync the Spec with Collection"
+
+          # Trigger the spec sync
+          SYNC_RESPONSE=$(curl --silent --include \
+              --write-out "\n%{http_code}" \
+              --request PUT \
+              --header "X-Api-Key: ${POSTMAN_API_KEY}" \
+              --header "Content-Type: application/json" \
+              "https://api.getpostman.com/collections/${COLLECTION_ID}/synchronizations?specId=${SPEC_ID}")
+
+          HTTP_STATUS=$(echo "${SYNC_RESPONSE}" | tail -n1)
+          BODY=$(echo "${SYNC_RESPONSE}" | head -n -1)
+
+          echo "Sync response: ${BODY}"
+          echo "HTTP status: ${HTTP_STATUS}"
+
+          # 2xx → sync was successfully made; 400 → spec is already in sync
+          if [[ "${HTTP_STATUS}" =~ ^2 ]]; then
+            echo "✅ Sync successful — collection has been updated to match the spec."
+          elif [[ "${HTTP_STATUS}" == "400" ]]; then
+            echo "✅ Spec is already in sync with the collection. No action needed."
+          else
+            echo "::error::Sync failed with unexpected status ${HTTP_STATUS}."
+            exit 1
+          fi
+
+  automated-api-tests:
+    runs-on: ubuntu-latest
+    needs: postman-api-checks
+    steps:
+      # ──────────────────────────────────────────────────────────────────────────
+      # STEP 2: Lint the spec
+      # ──────────────────────────────────────────────────────────────────────────
+      - uses: actions/checkout@v4
+      - name: Install Postman CLI
+        run: |
+          curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
+      - name: Login to Postman CLI
+        run: postman login --with-api-key ${POSTMAN_API_KEY}
+      - name: Lint the spec
+        run: |
+          postman spec lint "${SPEC_ID}" --report-events
+      # ──────────────────────────────────────────────────────────────────────────
+      # STEP 3: Run the API tests
+      # ──────────────────────────────────────────────────────────────────────────
+      - name: Run API tests
+        run: |
+          postman collection run "${COLLECTION_ID}" -e "${ENVIRONMENT_ID}" --report-events

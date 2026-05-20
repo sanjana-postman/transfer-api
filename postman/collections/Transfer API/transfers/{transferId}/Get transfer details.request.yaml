@@ -1,5 +1,4 @@
 $kind: http-request
-description: Retrieve details for a specific transfer by its unique identifier.
 url: "{{baseUrl}}/transfers/:transferId"
 method: GET
 headers:

@@ -26,13 +26,18 @@ description: |-
 url: "{{baseUrl}}/transfers/rails-quote"
 method: POST
 headers:
-  Content-Type: application/json
-  Accept: application/json
+  - key: Content-Type
+    value: application/json
+  - key: Accept
+    value: application/json
+  - key: Authorization
+    value: Bearer {{vault:key}}
+    disabled: true
 body:
   type: json
   content: |-
     {
-      "amount": 500.00, 
+        "amount": 500.00, 
         "currency": "USD", 
         "beneficiaryId": "BEN-ACH-00234"
     }
