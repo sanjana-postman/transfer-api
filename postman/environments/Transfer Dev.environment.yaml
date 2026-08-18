@@ -1,0 +1,4 @@
+name: Transfer Dev
+values:
+  - key: baseUrl
+    value: 'http://localhost:4500'

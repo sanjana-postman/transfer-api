@@ -9,3 +9,8 @@ workflows:
       collection: ../postman/collections/Transfer API
       options:
         syncExamples: false
+  syncCollectionToSpec:
+    - spec: ../postman/specs/index.yaml
+      collection: ../postman/collections/Transfer API
+      options:
+        syncExamples: false

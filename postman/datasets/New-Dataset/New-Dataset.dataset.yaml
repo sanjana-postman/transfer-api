@@ -1,0 +1,23 @@
+type: dataset
+name: New Dataset
+id: ac9c054e-6044-403d-8592-cdd0b5e26561
+data_dir: .resources
+sources:
+  - from: embedded_datasource
+    datasource:
+      name: data
+      id: 86a2cc65-864c-4e00-948d-027077195d9a
+      format: mysql
+      source_type: dynamic
+      location:
+        type: mysql
+        value: "root:abc123@tcp(127.0.0.1:3306)/transfers"
+        table: 
+      slug: data
+views:
+  - from: embedded_view
+    view:
+      name: 'New View'
+      id: 5b48ec9d-328c-4adb-931a-5eb5ca39eafe
+      query: |-
+        SELECT * FROM data

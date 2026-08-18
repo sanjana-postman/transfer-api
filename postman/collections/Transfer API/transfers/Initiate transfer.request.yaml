@@ -1,4 +1,5 @@
 $kind: http-request
+name: Initiate transfer
 description: |
   Transfer funds across 3 payment rails: ACH, Wire Transfer, Real-Time Payments.
 
@@ -11,8 +12,13 @@ description: |
 url: "{{baseUrl}}/transfers"
 method: POST
 headers:
-  Content-Type: application/json
-  Accept: application/json
+  - key: Content-Type
+    value: application/json
+    disabled: true
+  - key: Accept
+    value: application/json
+  - key: Content-Type
+    value: application/x-amz-json-1.0
 body:
   type: json
   content: |-

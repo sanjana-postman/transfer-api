@@ -1,0 +1,5 @@
+# Lock files from dataset YAML concurrent writes
+**/*.lock
+
+# Temp files for dataset creation
+.temp/
