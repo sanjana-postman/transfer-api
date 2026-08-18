@@ -50,5 +50,121 @@ auth:
   type: bearer
   credentials:
     token: "{{bearerToken}}"
+events:
+  - listen: test
+    script: |-
+      var template = `
+      <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; padding: 16px; background: #fff; color: #111; }
+        h2 { font-size: 13px; font-weight: 600; color: #6b7280; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+        .kpi-row { display: flex; gap: 10px; margin-bottom: 20px; }
+        .kpi { flex: 1; background: #f3f4f6; border-radius: 8px; padding: 12px 14px; }
+        .kpi .label { font-size: 11px; color: #6b7280; margin-bottom: 4px; }
+        .kpi .value { font-size: 20px; font-weight: 700; }
+        .kpi .sub { font-size: 11px; color: #6b7280; margin-top: 2px; }
+        .chart-wrap { margin-bottom: 20px; }
+        .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .bar-label { width: 48px; font-size: 12px; font-weight: 600; text-align: right; }
+        .bar-track { flex: 1; background: #e5e7eb; border-radius: 6px; height: 28px; }
+        .bar-fill { height: 100%; border-radius: 6px; }
+        .bar-val { width: 44px; font-size: 12px; font-weight: 600; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        thead th { text-align: left; padding: 7px 10px; font-size: 11px; font-weight: 600; color: #6b7280; border-bottom: 1px solid #e5e7eb; text-transform: uppercase; }
+        tbody td { padding: 8px 10px; border-bottom: 1px solid #f3f4f6; }
+        .badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 20px; background: rgba(16,185,129,0.15); color: #059669; }
+        .divider { border: none; border-top: 1px solid #e5e7eb; margin: 16px 0; }
+        .caption { font-size: 11px; color: #6b7280; margin-top: 8px; }
+        .section-title { font-size: 13px; font-weight: 600; margin-bottom: 10px; }
+      </style>
+
+      <div class="kpi-row">
+        <div class="kpi">
+          <div class="label">Transfer Amount</div>
+          <div class="value">${{data.amount}} {{data.currency}}</div>
+          <div class="sub">{{data.currency}}</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Beneficiary</div>
+          <div class="value" style="font-size:14px;padding-top:4px;">{{data.beneficiaryId}}</div>
+          <div class="sub">{{data.railCount}} rails available</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Lowest Fee</div>
+          <div class="value">${{data.lowestFee}}</div>
+          <div class="sub">via {{data.lowestRail}}</div>
+        </div>
+      </div>
+
+      <hr class="divider"/>
+      <div class="section-title">Fee Comparison by Payment Rail</div>
+      <div class="chart-wrap">
+        {{#each data.quotes}}
+        <div class="bar-row">
+          <div class="bar-label">{{rail}}</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:{{pct}}%;background:{{color}};"></div>
+          </div>
+          <div class="bar-val">${{fee}}</div>
+        </div>
+        {{/each}}
+      </div>
+
+      <hr class="divider"/>
+      <div class="section-title">All Quotes</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Rail</th>
+            <th>Fee</th>
+            <th>Delivery</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each data.quotes}}
+          <tr>
+            <td><strong>{{rail}}</strong></td>
+            <td>${{fee}}</td>
+            <td>{{estimatedDelivery}}</td>
+            <td><span class="badge">&#10003; Available</span></td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+      <div class="caption">{{data.railCount}} quotes returned</div>
+      `;
+
+      function constructVisualizerPayload() {
+        var res = pm.response.json();
+        var quotes = res.quotes || [];
+        var maxFee = Math.max.apply(null, quotes.map(function(q) { return q.fee; }));
+        var minFee = Math.min.apply(null, quotes.map(function(q) { return q.fee; }));
+        var lowestQuote = quotes.filter(function(q) { return q.fee === minFee; })[0] || {};
+        var railColors = { ach: '#6366f1', wire: '#f59e0b', rtp: '#10b981' };
+        var enriched = quotes.map(function(q) {
+          return {
+            rail: q.rail.toUpperCase(),
+            fee: q.fee.toFixed(2),
+            estimatedDelivery: q.estimatedDelivery,
+            available: q.available,
+            pct: maxFee > 0 ? Math.round((q.fee / maxFee) * 100) : 0,
+            color: railColors[q.rail] || '#6366f1'
+          };
+        });
+        return {
+          data: {
+            amount: res.amount,
+            currency: res.currency,
+            beneficiaryId: res.beneficiaryId,
+            railCount: quotes.length,
+            lowestFee: minFee.toFixed(2),
+            lowestRail: lowestQuote.rail ? lowestQuote.rail.toUpperCase() : '',
+            quotes: enriched
+          }
+        };
+      }
+
+      pm.visualizer.set(template, constructVisualizerPayload());
 examples: ./.resources/Get quote for all payment rails.resources/examples
 order: 1000
