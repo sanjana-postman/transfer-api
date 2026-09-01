@@ -1,7 +1,6 @@
 $kind: http-example
 request:
-  url: "{{baseUrl}}/transfers?fromDate=<date>&toDate=<date>&status=failed&type=wi\
-    re&limit=20&offset=0"
+  url: "{{baseUrl}}/transfers?fromDate=<date>&toDate=<date>&status=failed&type=wire&limit=20&offset=0"
   method: GET
   headers:
     - key: Accept
@@ -12,21 +11,27 @@ request:
   queryParams:
     - key: fromDate
       value: <date>
+      disabled: false
       description: Filter start date
     - key: toDate
       value: <date>
+      disabled: false
       description: Filter end date
     - key: status
       value: failed
+      disabled: false
       description: Filter by transfer status
     - key: type
       value: wire
+      disabled: false
       description: Filter by transfer type
     - key: limit
       value: "20"
+      disabled: false
       description: Maximum number of results to return
     - key: offset
       value: "0"
+      disabled: false
       description: Pagination offset
   body:
     type: text
@@ -37,7 +42,7 @@ response:
   headers:
     Content-Type: application/json
   body:
-    type: text
+    type: json
     content: |-
       {
         "error": "<string>",
@@ -52,5 +57,38 @@ response:
             "message": "<string>"
           }
         ]
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "example": "INVALID_REQUEST",
+            "description": "Error code"
+          },
+          "message": {
+            "type": "string",
+            "example": "The request is missing required fields",
+            "description": "Human-readable error message"
+          },
+          "details": {
+            "type": "array",
+            "description": "Additional error details",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {
+                  "type": "string",
+                  "example": "amount"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Must be a positive number"
+                }
+              }
+            }
+          }
+        }
       }
 order: 2000

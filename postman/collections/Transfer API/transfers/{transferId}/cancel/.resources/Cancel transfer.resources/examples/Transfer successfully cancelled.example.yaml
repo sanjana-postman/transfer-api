@@ -11,6 +11,7 @@ request:
   pathVariables:
     - key: transferId
       value: string
+      disabled: false
       description: The unique identifier of the transfer
   body:
     type: text
@@ -21,12 +22,41 @@ response:
   headers:
     Content-Type: application/json
   body:
-    type: text
+    type: json
     content: |-
       {
         "transferId": "TRF789012345",
         "status": "completed",
         "cancelledAt": "<dateTime>",
         "message": "<string>"
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "transferId": {
+            "type": "string",
+            "example": "TXN-20230527-00123",
+            "description": "The ID of the cancelled transfer"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "cancelled"
+            ],
+            "example": "cancelled"
+          },
+          "cancelledAt": {
+            "type": "string",
+            "example": "2023-05-27T11:00:00Z",
+            "description": "Timestamp when the transfer was cancelled",
+            "format": "date-time"
+          },
+          "message": {
+            "type": "string",
+            "example": "Transfer successfully cancelled",
+            "description": "Confirmation message"
+          }
+        }
       }
 order: 1000

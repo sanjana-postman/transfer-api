@@ -1,5 +1,4 @@
 $kind: collection
-name: Transfer API
 description: |-
   The Transfers API enables initiation and management of fund transfers including
   ACH, wire transfers, and real-time payments.
@@ -38,6 +37,6 @@ scripts:
       "@field-services-v12-demo/conformance-test":
         id: 019cc120-c8d5-7281-80d1-64e0193142e5
 auth:
-  - id: 241fa0d1-9e8f-433b-b59d-8c9232c9e2e5
+  - id: 204995c3-a27d-44c2-bc23-76921bd7d33c
     type: bearer
     name: bearer auth

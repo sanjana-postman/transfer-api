@@ -19,8 +19,7 @@ request:
         "amount": 1500,
         "currency": "string",
         "type": "rtp",
-        "memo": "string",
-        "scheduledDate": "2011-11-06"
+        "memo": "string"
       }
 response:
   statusCode: 200
@@ -28,7 +27,7 @@ response:
   headers:
     Content-Type: application/json
   body:
-    type: text
+    type: json
     content: |-
       {
         "valid": true,
@@ -46,5 +45,52 @@ response:
           "string",
           "string"
         ]
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "valid": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether the transfer request is valid"
+          },
+          "errors": {
+            "type": "array",
+            "description": "List of validation errors (empty if valid)",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {
+                  "type": "string",
+                  "example": "amount",
+                  "description": "The field that failed validation"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Amount exceeds daily transfer limit",
+                  "description": "Description of the validation error"
+                }
+              }
+            }
+          },
+          "warnings": {
+            "type": "array",
+            "description": "Non-blocking warnings about the transfer",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {
+                  "type": "string",
+                  "example": "type"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "RTP is not available for this destination bank"
+                }
+              }
+            }
+          }
+        }
       }
 order: 1000

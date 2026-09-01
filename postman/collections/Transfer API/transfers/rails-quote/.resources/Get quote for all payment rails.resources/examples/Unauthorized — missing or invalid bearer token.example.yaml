@@ -1,6 +1,6 @@
 $kind: http-example
 request:
-  url: "{{baseUrl}}/transfers/validate"
+  url: "{{baseUrl}}/transfers/rails-quote"
   method: POST
   headers:
     - key: Content-Type
@@ -14,32 +14,29 @@ request:
     type: json
     content: |-
       {
-        "sourceAccountId": "<string>",
-        "beneficiaryId": "<string>",
-        "amount": "<double>",
-        "currency": "<string>",
-        "type": "rtp",
-        "memo": "<string>"
+        "amount": 500,
+        "currency": "USD",
+        "beneficiaryId": "BEN-ACH-00234"
       }
 response:
-  statusCode: 500
-  statusText: Internal Server Error
+  statusCode: 401
+  statusText: Unauthorized
   headers:
     Content-Type: application/json
   body:
-    type: json
+    type: text
     content: |-
       {
-        "error": "<string>",
-        "message": "<string>",
+        "error": "INVALID_REQUEST",
+        "message": "The request is missing required fields",
         "details": [
           {
-            "field": "<string>",
-            "message": "<string>"
+            "field": "amount",
+            "message": "Must be a positive number"
           },
           {
-            "field": "<string>",
-            "message": "<string>"
+            "field": "amount",
+            "message": "Must be a positive number"
           }
         ]
       }
@@ -76,4 +73,4 @@ response:
           }
         }
       }
-order: 5000
+order: 3000

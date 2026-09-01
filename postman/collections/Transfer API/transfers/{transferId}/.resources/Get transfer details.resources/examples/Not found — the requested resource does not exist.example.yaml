@@ -11,6 +11,7 @@ request:
   pathVariables:
     - key: transferId
       value: string
+      disabled: false
       description: The unique identifier of the transfer
   body:
     type: text
@@ -21,7 +22,7 @@ response:
   headers:
     Content-Type: application/json
   body:
-    type: text
+    type: json
     content: |-
       {
         "error": "<string>",
@@ -36,5 +37,38 @@ response:
             "message": "<string>"
           }
         ]
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "example": "INVALID_REQUEST",
+            "description": "Error code"
+          },
+          "message": {
+            "type": "string",
+            "example": "The request is missing required fields",
+            "description": "Human-readable error message"
+          },
+          "details": {
+            "type": "array",
+            "description": "Additional error details",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {
+                  "type": "string",
+                  "example": "amount"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Must be a positive number"
+                }
+              }
+            }
+          }
+        }
       }
 order: 3000

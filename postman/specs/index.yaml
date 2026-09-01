@@ -216,7 +216,7 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
-  /transfers/rails-quote/:
+  /transfers/rails-quote:
     post:
       tags:
         - Utilities

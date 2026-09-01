@@ -1,5 +1,4 @@
 $kind: http-request
-name: Initiate transfer
 description: |
   Transfer funds across 3 payment rails: ACH, Wire Transfer, Real-Time Payments.
 
@@ -12,13 +11,8 @@ description: |
 url: "{{baseUrl}}/transfers"
 method: POST
 headers:
-  - key: Content-Type
-    value: application/json
-    disabled: true
-  - key: Accept
-    value: application/json
-  - key: Content-Type
-    value: application/x-amz-json-1.0
+  Content-Type: application/x-amz-json-1.0
+  Accept: application/json
 body:
   type: json
   content: |-
@@ -28,8 +22,62 @@ body:
       "amount": 1500,
       "currency": "string",
       "type": "rtp",
-      "memo": "string",
-      "scheduledDate": "2011-11-06"
+      "memo": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "sourceAccountId": {
+          "type": "string",
+          "example": "AC-9827364501-CHK",
+          "description": "The account ID to debit funds from"
+        },
+        "beneficiaryId": {
+          "type": "string",
+          "example": "BEN-ACH-00234",
+          "description": "The registered beneficiary to credit funds to"
+        },
+        "amount": {
+          "type": "number",
+          "minimum": 0.01,
+          "example": 2500,
+          "description": "Amount to transfer (must be positive)",
+          "format": "double"
+        },
+        "currency": {
+          "type": "string",
+          "example": "USD",
+          "description": "ISO 4217 currency code"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "ach",
+            "wire",
+            "rtp"
+          ],
+          "description": "Payment rail type:\n- `ach`: Automated Clearing House — standard domestic (1-3 business days)\n- `wire`: Wire transfer — same-day domestic and international\n- `rtp`: Real-Time Payments — instant, domestic only\n"
+        },
+        "memo": {
+          "type": "string",
+          "example": "Monthly rent payment - Unit 4B",
+          "description": "Optional memo or reference note for the transfer"
+        },
+        "scheduledDate": {
+          "type": "string",
+          "example": "2023-06-01",
+          "description": "Optional future date to schedule the transfer",
+          "format": "date"
+        }
+      },
+      "required": [
+        "sourceAccountId",
+        "beneficiaryId",
+        "amount",
+        "currency",
+        "type"
+      ]
     }
 examples: ./.resources/Initiate transfer.resources/examples
 order: 4000

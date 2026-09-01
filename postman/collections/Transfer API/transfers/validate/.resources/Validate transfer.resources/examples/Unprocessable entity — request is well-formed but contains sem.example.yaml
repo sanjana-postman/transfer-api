@@ -1,4 +1,5 @@
 $kind: http-example
+name: Unprocessable entity — request is well-formed but contains semantic errors
 request:
   url: "{{baseUrl}}/transfers/validate"
   method: POST
@@ -22,8 +23,8 @@ request:
         "memo": "<string>"
       }
 response:
-  statusCode: 500
-  statusText: Internal Server Error
+  statusCode: 422
+  statusText: Unprocessable Entity (WebDAV) (RFC 4918)
   headers:
     Content-Type: application/json
   body:
@@ -76,4 +77,4 @@ response:
           }
         }
       }
-order: 5000
+order: 4000

@@ -1,6 +1,5 @@
 $kind: http-request
-description: Cancel a pending transfer. Only available for transfers in
-  `scheduled` or `pending` status.
+description: Cancel a pending transfer. Only available for transfers in `scheduled` or `pending` status.
 url: "{{baseUrl}}/transfers/:transferId/cancel"
 method: POST
 headers:
@@ -8,7 +7,22 @@ headers:
 pathVariables:
   - key: transferId
     value: string
+    disabled: false
     description: The unique identifier of the transfer
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "description": "The unique identifier of the transfer",
+            "type": "string",
+            "example": "TXN-20230527-00123"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
 body:
   type: text
   content: ""

@@ -1,6 +1,6 @@
 $kind: http-example
 request:
-  url: "{{baseUrl}}/transfers/validate"
+  url: "{{baseUrl}}/transfers"
   method: POST
   headers:
     - key: Content-Type
@@ -14,12 +14,12 @@ request:
     type: json
     content: |-
       {
-        "sourceAccountId": "<string>",
-        "beneficiaryId": "<string>",
-        "amount": "<double>",
-        "currency": "<string>",
-        "type": "rtp",
-        "memo": "<string>"
+        "sourceAccountId": "AC-9827364501-CHK",
+        "beneficiaryId": "BEN-ACH-00234",
+        "amount": 2500,
+        "currency": "USD",
+        "type": "ach",
+        "memo": "Monthly rent payment - Unit 4B"
       }
 response:
   statusCode: 500
@@ -30,16 +30,16 @@ response:
     type: json
     content: |-
       {
-        "error": "<string>",
-        "message": "<string>",
+        "error": "INVALID_REQUEST",
+        "message": "The request is missing required fields",
         "details": [
           {
-            "field": "<string>",
-            "message": "<string>"
+            "field": "amount",
+            "message": "Must be a positive number"
           },
           {
-            "field": "<string>",
-            "message": "<string>"
+            "field": "amount",
+            "message": "Must be a positive number"
           }
         ]
       }
